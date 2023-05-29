@@ -31,7 +31,7 @@ const ProductCard = ({ productData, onAddToCart, onRemoveFromCart, numberOfProdu
 
       <View style={styles.contentContainer}>
         <Text style={styles.name}>{productData?.name}</Text>
-        <Text>${productData?.price}</Text>
+        <Text style={styles.price}>Price: ${productData?.price}/Pc</Text>
         {
           type === 'cartPage' &&
           <View style={{ flex: 1, justifyContent: "flex-end" }}>
@@ -95,6 +95,11 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     fontWeight: "700",
+  },
+  price: {
+    fontSize: 16,
+    fontWeight: "500",
+    paddingTop: 8
   },
   image: {
     width: 80,

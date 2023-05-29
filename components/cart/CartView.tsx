@@ -1,6 +1,6 @@
 import { View, Text, FlatList, StyleSheet, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { addToCart, removeFromCart } from "../../redux/cartSlice";
 import { useDispatch, useSelector, TypedUseSelectorHook } from "react-redux";
 import ProductCard from "../products/ProductCard";
@@ -9,7 +9,6 @@ import { Product } from "../../models/Product";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
 
 const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
@@ -35,7 +34,6 @@ const CartView = () => {
 
   };
 
-
   useEffect(() => {
     const tempItems = products?.filter((product) => {
       if (product.id in cart) {
@@ -46,6 +44,26 @@ const CartView = () => {
 
     setFilteredProducts(tempItems);
   }, [cart]);
+
+  const getFinalPrice = () => {
+    let totalValue: number = 0
+    filteredProducts.map((item: Product) => {
+      const itemQuantity = cart[item.id]
+      totalValue = totalValue + ((item.price || 0) * itemQuantity)
+    })
+    return totalValue
+  }
+
+  const totalPrice = useMemo(() => getFinalPrice(), [filteredProducts])
+
+  const footer = () => {
+    return (
+      <View style={styles.headerStyle}>
+        <Text style={styles.titleStyle}>Total: </Text>
+        <Text style={styles.titleStyle}>${totalPrice}</Text>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -79,6 +97,7 @@ const CartView = () => {
             type="cartPage"
           />
         )}
+        ListFooterComponent={filteredProducts.length > 0 ? footer : null}
       />
     </View>
   );
@@ -131,5 +150,20 @@ const styles = StyleSheet.create({
     height: 10,
     width: 10,
     resizeMode: "contain",
+  },
+  headerStyle: {
+    flex: 1,
+    flexDirection: 'row',
+    height: 40,
+    width: '100%',
+    marginTop: 20,
+    backgroundColor: '#FFF',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20
+  },
+  titleStyle: {
+    fontSize: 18,
+    fontWeight: 'bold'
   },
 });
